@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            table, td, th{
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <table id="tabla">
+            <thead>
+                <th>Nombre</th>
+                <th>Cargo</th>
+                <th>Fecha Contratacion</th>
+                <th>Contacto</th>
+                <th>Salario</th>
+            </thead>
+        </table>
+
+        <script>
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                myFunction(this);
+                }
+            };
+            xhttp.open("GET", "empresa.xml", true);
+            xhttp.send();
+
+            function myFunction(xml) {
+                var xmlDoc = xml.responseXML;
+                var x = xmlDoc.getElementsByTagName("nombre")[0].childNodes[0];
+                var txt = x.nodeValue;                
+                for(let i = 0; i < x.length; i++) {
+                let nombre = xmlDoc.getElementsByTagName("nombre")[i].childNodes[0].nodeValue;
+                let cargo =  xmlDoc.getElementsByTagName("cargo")[i].childNodes[0].nodeValue;
+                let fContratacion=xmlDoc.getElementsByTagName("fecha_contratacion")[i].childNodes[0].nodeValue;
+                let email=xmlDoc.getElementsByTagName("email")[i].childNodes[0].nodeValue;
+                let telefono=xmlDoc.getElementsByTagName("telefono")[i].childNodes[0].nodeValue;
+                let s1=parseInt(xmlDoc.getElementsByTagName("base")[i].childNodes[0].nodeValue);
+                let s2=parseInt(xmlDoc.getElementsByTagName("bonificacion")[i].childNodes[0].nodeValue);
+                let s3=parseInt(xmlDoc.getElementsByTagName("seguro_medico")[i].childNodes[0].nodeValue);
+                let s4=parseInt(xmlDoc.getElementsByTagName("vacaciones")[i].childNodes[0].nodeValue);
+                let salario=s1+s2+s3+s4;
+                tabla.innerHTML += `<tr><td>${nombre}</td><td>${cargo}</td><td>${fContratacion}</td><td>Email: ${email}<br>Tlf: ${telefono}</td><td>${salario} €</td></tr>`;
+            }
+            }
+        </script>
+    </body>
+</html>
