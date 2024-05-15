@@ -4,53 +4,122 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        table, td, th {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+        }
+    </style>
 </head>
 <body>
     <h3 id="localidad"></h3>
     <h4 id="prov"></h4>
     <table id="tabla">
         <thead>
-            <th>Fecha (12:00-24:00)</th>
-            <th>Probabilidad Precipitacion</th>
-            <th>Estado del cielo</th>
-            <th>Direccion y velocidad del viento</th>
-            <th>°C Max 12:00</th>
-            <th>°C Min 12:00</th>
-            <th>°C Max 24:00</th>
-            <th>°C Min 24:00</th>
+            <tr>
+                <th>Fecha (12:00-24:00)</th>
+                <th>Probabilidad Precipitación</th>
+                <th>Estado del cielo</th>
+                <th>Dirección y velocidad del viento</th>
+                <th>°C Max</th>
+                <th>°C Min</th>
+            </tr>
         </thead>
-        <script>
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    myFunction(this);
-                }
-            };
-            xhttp.open("GET", "elTiempo.xml", true);
-            xhttp.send();
-
-            function myFunction(xml) {
-                var xmlDoc = xml.responseXML;
-                var x = xmlDoc.getElementsByTagName("dia")[0].childNodes[0];
-                var txt = x.nodeValue;
-
-                let nombre = xmlDoc.getElementsByTagName("nombre")[0].childNodes[0].nodeValue;
-                let provincia =  xmlDoc.getElementsByTagName("provincia")[0].childNodes[0].nodeValue;
-                prov.innerHTML=`(${provincia})`;
-                localidad.innerHTML=nombre;
-                let dias = xmlDoc.getElementsByTagName("dia");
-
-                for(let i = 0; i < x.length; i++) {
-                    if (i >= 0 && i < dias.length) {
-                        let fecha = dias[i].getAttribute("fecha");
-                        tabla.innerHTML += `<tr><td>${fecha}</td></tr>`;
-
-                    } else {
-                        console.log("El índice está fuera de rango o el elemento 'dia' no está presente.");
-                    }
-                }
-            }
-        </script>
+        <tbody>
+        </tbody>
     </table>
+    <script>
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                myFunction(this);
+            }
+        };
+        xhttp.open("GET", "elTiempo.xml", true);
+        xhttp.send();
+
+        function myFunction(xml) {
+            var xmlDoc = xml.responseXML;
+
+            let nombre = xmlDoc.getElementsByTagName("nombre")[0].childNodes[0].nodeValue;
+            let provincia = xmlDoc.getElementsByTagName("provincia")[0].childNodes[0].nodeValue;
+            document.getElementById("prov").innerHTML = `(${provincia})`;
+            document.getElementById("localidad").innerHTML = nombre;
+
+            let dias = xmlDoc.getElementsByTagName("dia");
+            let tbody = document.querySelector("#tabla tbody");
+
+            for (let i = 0; i < dias.length; i++) {
+                let fecha = dias[i].getAttribute("fecha");
+                let fila = `<tr><td>${fecha}</td>`;
+
+                let periodo = "12-24";
+                let prob_precipitacion = "N/A";
+                let estado_cielo = "N/A";
+                let direccion_viento = "N/A";
+                let velocidad_viento = "N/A";
+                let temp_max = "N/A";
+                let temp_min = "N/A";
+
+                let probabilidades = dias[i].getElementsByTagName("prob_precipitacion");
+                for (let j = 0; j < probabilidades.length; j++) {
+                    if(probabilidades[j].hasAttribute('periodo')){
+                        if (probabilidades[j].getAttribute("periodo") == periodo) {
+                        prob_precipitacion = probabilidades[j].textContent + "%";
+                        }
+                    }else{
+                        prob_precipitacion = probabilidades[j].textContent + "%";
+
+                    }
+                    
+                }
+
+                let estados_cielo = dias[i].getElementsByTagName("estado_cielo");
+                for (let j = 0; j < estados_cielo.length; j++) {
+                    if(probabilidades[j].hasAttribute('periodo')){
+                        if (estados_cielo[j].getAttribute("periodo") == periodo) {
+                        estado_cielo = estados_cielo[j].getAttribute('descripcion');
+                        }
+                    }else{
+                        estado_cielo = estados_cielo[j].getAttribute('descripcion');
+                    }
+                    
+                }
+
+                let vientos = dias[i].getElementsByTagName("viento");
+                for (let j = 0; j < vientos.length; j++) {
+                    if(probabilidades[j].hasAttribute('periodo')){
+                        if (vientos[j].getAttribute("periodo") == periodo) {
+                        direccion_viento = vientos[j].getElementsByTagName('direccion')[0].textContent;
+                        velocidad_viento = vientos[j].getElementsByTagName('velocidad')[0].textContent + " km/h";
+                        }
+                    }else{
+                        direccion_viento = vientos[j].getElementsByTagName('direccion')[0].textContent;
+                        velocidad_viento = vientos[j].getElementsByTagName('velocidad')[0].textContent + " km/h";
+                    }
+                
+                    
+                }
+
+                let temperaturas = dias[i].getElementsByTagName("temperatura")[0];
+                if (temperaturas) {
+                    temp_max = temperaturas.getElementsByTagName('maxima')[0].textContent;
+                    temp_min = temperaturas.getElementsByTagName('minima')[0].textContent;
+                }
+
+                fila += `<td>${prob_precipitacion}</td>`;
+                fila += `<td>${estado_cielo}</td>`;
+                fila += `<td>${direccion_viento} ${velocidad_viento}</td>`;
+                fila += `<td>${temp_max}</td>`;
+                fila += `<td>${temp_min}</td>`;
+                fila += `</tr>`;
+
+                tbody.innerHTML += fila;
+            }
+        }
+    </script>
 </body>
 </html>
