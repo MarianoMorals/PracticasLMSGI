@@ -28,7 +28,7 @@
                 <th>°C Min</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="cuerpo">
         </tbody>
     </table>
     <script>
@@ -50,19 +50,19 @@
             document.getElementById("localidad").innerHTML = nombre;
 
             let dias = xmlDoc.getElementsByTagName("dia");
-            let tbody = document.querySelector("#tabla tbody");
+            let tbody = document.getElementById('cuerpo');
 
             for (let i = 0; i < dias.length; i++) {
                 let fecha = dias[i].getAttribute("fecha");
                 let fila = `<tr><td>${fecha}</td>`;
 
                 let periodo = "12-24";
-                let prob_precipitacion = "N/A";
-                let estado_cielo = "N/A";
-                let direccion_viento = "N/A";
-                let velocidad_viento = "N/A";
-                let temp_max = "N/A";
-                let temp_min = "N/A";
+                let prob_precipitacion = "";
+                let estado_cielo = "";
+                let direccion_viento = "";
+                let velocidad_viento = "";
+                let temp_max = "";
+                let temp_min = "";
 
                 let probabilidades = dias[i].getElementsByTagName("prob_precipitacion");
                 for (let j = 0; j < probabilidades.length; j++) {
